@@ -4,41 +4,75 @@ package geos
 #include <geos_c.h>
 */
 import "C"
+import "runtime"
+
+type GeometryType int
+
+const (
+	Point              GeometryType = C.GEOS_POINT
+	LineString         GeometryType = C.GEOS_LINESTRING
+	LinearRing         GeometryType = C.GEOS_LINEARRING
+	Polygon            GeometryType = C.GEOS_POLYGON
+	MultiPoint         GeometryType = C.GEOS_MULTIPOINT
+	MultiLineString    GeometryType = C.GEOS_MULTILINESTRING
+	MultiPolygon       GeometryType = C.GEOS_MULTIPOLYGON
+	GeometryCollection GeometryType = C.GEOS_GEOMETRYCOLLECTION
+)
 
 type Geometry struct {
-	h *C.GEOSGeometry
+	cval *C.GEOSGeometry
 }
 
-// func NewGeometry() *Geometry {
+func newGeometry(cval *C.GEOSGeometry) *Geometry {
+	if cval == nil {
+		return nil
+	}
 
-// }
+	g := &Geometry{
+		cval: cval,
+	}
 
-// func (g *Geometry) Clone() *Geometry {
+	runtime.SetFinalizer(g, func(g *Geometry) {
+		C.GEOSGeom_destroy_r(handle, cval)
+	})
 
-// }
+	return g
+}
 
-func (g *Geometry) GEOSDisjoint(other *Geometry) bool   { return GEOSDisjoint(g, other) }
-func (g *Geometry) GEOSTouches(other *Geometry) bool    { return GEOSTouches(g, other) }
-func (g *Geometry) GEOSIntersects(other *Geometry) bool { return GEOSINTERsects(g, other) }
-func (g *Geometry) GEOSCrosses(other *Geometry) bool    { return GEOSCrosses(g, other) }
-func (g *Geometry) GEOSWithin(other *Geometry) bool     { return GEOSWithin(g, other) }
-func (g *Geometry) GEOSContains(other *Geometry) bool   { return GEOSContains(g, other) }
-func (g *Geometry) GEOSOverlaps(other *Geometry) bool   { return GEOSOverlaps(g, other) }
-func (g *Geometry) GEOSEquals(other *Geometry) bool     { return GEOSEquals(g, other) }
-func (g *Geometry) GEOSCovers(other *Geometry) bool     { return GEOSCovers(g, other) }
-func (g *Geometry) GEOSCoveredBy(other *Geometry) bool  { return GEOSCoveredBy(g, other) }
+func (g *Geometry) Envelope() *Geometry {
+	v := C.GEOSEnvelope_r(handle, g.cval)
+	return newGeometry(v)
+}
+
+func (g *Geometry) Buffer(width float64, quadsegs int) *Geometry {
+	v := C.GEOSBuffer_r(handle, g.cval, C.double(width), C.int(quadsegs))
+	return newGeometry(v)
+}
+
+func (g *Geometry) Clone() *Geometry {
+	v := C.GEOSGeom_clone_r(handle, g.cval)
+	return newGeometry(v)
+}
+
+func (g *Geometry) Disjoint(other *Geometry) bool   { return Disjoint(g, other) }
+func (g *Geometry) Touches(other *Geometry) bool    { return Touches(g, other) }
+func (g *Geometry) Intersects(other *Geometry) bool { return Intersects(g, other) }
+func (g *Geometry) Crosses(other *Geometry) bool    { return Crosses(g, other) }
+func (g *Geometry) Within(other *Geometry) bool     { return Within(g, other) }
+func (g *Geometry) Contains(other *Geometry) bool   { return Contains(g, other) }
+func (g *Geometry) Overlaps(other *Geometry) bool   { return Overlaps(g, other) }
+func (g *Geometry) Equals(other *Geometry) bool     { return Equals(g, other) }
+func (g *Geometry) Covers(other *Geometry) bool     { return Covers(g, other) }
+func (g *Geometry) CoveredBy(other *Geometry) bool  { return CoveredBy(g, other) }
+
+func (g *Geometry) IsEmpty() bool {
+	return C.GEOSisEmpty_r(handle, g.cval) == 1
+}
+
+func (g *Geometry) IsValid() bool {
+	return C.GEOSisValid_r(handle, g.cval) == 1
+}
 
 func (g *Geometry) Destroy() {
-	C.GEOSGeom_destroy_r(handle, g.h)
+	C.GEOSGeom_destroy_r(handle, g.cval)
 }
-
-func GEOSDisjoint(g1, g2 *Geometry) bool  { return false }
-func GEOSTouches(g1, g2 *Geometry) bool   { return false }
-func GEOSIntersect(g1, g2 *Geometry) bool { return false }
-func GEOSCrosses(g1, g2 *Geometry) bool   { return false }
-func GEOSWithin(g1, g2 *Geometry) bool    { return false }
-func GEOSContains(g1, g2 *Geometry) bool  { return false }
-func GEOSOverlaps(g1, g2 *Geometry) bool  { return false }
-func GEOSEquals(g1, g2 *Geometry) bool    { return false }
-func GEOSCovers(g1, g2 *Geometry) bool    { return false }
-func GEOSCoveredBy(g1, g2 *Geometry) bool { return false }

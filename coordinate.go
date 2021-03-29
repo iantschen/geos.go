@@ -20,6 +20,6 @@ func (c *Coordinate) String() string {
 	return fmt.Sprintf("%f,%f", c[0], c[1])
 }
 
-func CoorindateSliceFrom(cs *CoordinateSequence) ([]Coordinate, error) {
+func CoorindateSliceFrom(cs *CoordSequence) ([]Coordinate, error) {
 	return nil, nil
 }

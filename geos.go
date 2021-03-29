@@ -5,18 +5,14 @@ package geos
 #include "geos.h"
 */
 import "C"
+import "fmt"
 
 var (
 	handle C.GEOSContextHandle_t
 )
 
 func init() {
-	handle = C.GEOS_init_r()
-
-	// if handle != nil {
-	//     C.GEOSContext_setNoticeHandler_r(handle, C.notice_handler);
-	//     C.GEOSContext_setErrorHandler_r(handle, C.error_handler);
-	// }
+	handle = C.init()
 }
 
 // Version returns the version of the GEOS C API in use.
@@ -25,10 +21,10 @@ func Version() string {
 }
 
 // Error gets the last error that occured in the GEOS C API as a Go error type.
-// func Error() error {
-// 	return fmt.Errorf("geos: %s", C.GoString(C.gogeos_get_last_error()))
-// }
+func Error() error {
+	return fmt.Errorf("geos: %s", C.GoString(C.get_last_error()))
+}
 
-func Finish() {
+func Release() {
 	C.GEOS_finish_r(handle)
 }

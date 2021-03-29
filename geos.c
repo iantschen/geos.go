@@ -23,3 +23,12 @@ const char * get_last_error() {
     return error_buffer;
 }
 
+
+GEOSContextHandle_t init() {
+    GEOSContextHandle_t h = GEOS_init_r();
+
+	GEOSContext_setNoticeHandler_r(h, notice_handler);
+	GEOSContext_setErrorHandler_r(h, error_handler);
+
+    return h;
+}
