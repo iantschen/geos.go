@@ -23,12 +23,19 @@ const char * get_last_error() {
     return error_buffer;
 }
 
-
-GEOSContextHandle_t init() {
+GEOSContextHandle_t newHandle() {
     GEOSContextHandle_t h = GEOS_init_r();
 
 	GEOSContext_setNoticeHandler_r(h, notice_handler);
 	GEOSContext_setErrorHandler_r(h, error_handler);
 
     return h;
+}
+
+GEOSWKTReader * newWKTReader(GEOSContextHandle_t h) {
+    return GEOSWKTReader_create_r(h);
+}
+
+GEOSWKTWriter * newWKTWriter(GEOSContextHandle_t h) {
+    return GEOSWKTWriter_create_r(h);
 }

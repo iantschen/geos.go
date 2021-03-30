@@ -11,4 +11,6 @@ void notice_handler(const char *fmt, ...);
 
 const char *get_last_error(void);
 
-GEOSContextHandle_t init();
+GEOSContextHandle_t newHandle();
+GEOSWKTReader * newWKTReader(GEOSContextHandle_t h);
+GEOSWKTWriter * newWKTWriter(GEOSContextHandle_t h);
