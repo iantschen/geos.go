@@ -51,36 +51,49 @@ func GeometryFromWKT(wkt string) *Geometry {
 	return newGeometry(v)
 }
 
-func NewPoint(c *Coordinate) (*Geometry, error) {
-
+func NewPoint(cs *CoordSequence) *Geometry {
+	v := C.GEOSGeom_createPoint_r(handle, cs.cval)
+	return newGeometry(v)
 }
 
-func NewLineString() (*Geometry, error) {
-
+func NewLineString(cs *CoordSequence) *Geometry {
+	v := C.GEOSGeom_createLineString_r(handle, cs.cval)
+	return newGeometry(v)
 }
 
-func NewLinearRing() (*Geometry, error) {
-
+func NewLinearRing(cs *CoordSequence) *Geometry {
+	v := C.GEOSGeom_createLinearRing_r(handle, cs.cval)
+	return newGeometry(v)
 }
 
-func NewPolygon(shell *Geometry, holes []*Geometry) (*Geometry, error) {
+func NewPolygon(shell *Geometry, holes ...*Geometry) *Geometry {
+	n := len(holes)
+	hs := make([]*C.GEOSGeometry, 0, n)
+	for _, h := range holes {
+		hs = append(hs, h.cval)
+	}
+	v := C.GEOSGeom_createPolygon_r(handle, shell.cval, &hs[0], C.uint(n))
 
+	return newGeometry(v)
 }
 
-func NewMultiPoint() (*Geometry, error) {
-
+func NewMultiPoint(points ...*Geometry) *Geometry {
+	return NewGeometryCollection(MultiPoint, points...)
 }
 
-func NewMultiLineString() (*Geometry, error) {
-
+func NewMultiLineString(lines ...*Geometry) *Geometry {
+	return NewGeometryCollection(MultiLineString, lines...)
 }
 
-func NewMultiPolygon() (*Geometry, error) {
-
+func NewMultiPolygon(polys ...*Geometry) *Geometry {
+	return NewGeometryCollection(MultiPolygon, polys...)
 }
 
-func NewGeometryCollection() (*Geometry, error) {
-
+func NewGeometryCollection(t GeometryType, geometries ...*Geometry) *Geometry {
+	n := len(geometries)
+	gs := make([]*C.GEOSGeometry, 0, n)
+	v := C.GEOSGeom_createCollection_r(handle, C.int(t), &gs[0], C.uint(n))
+	return newGeometry(v)
 }
 
 func (g *Geometry) MinX() float64 {
