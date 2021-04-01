@@ -6,7 +6,6 @@ package geos
 */
 import "C"
 import (
-	"runtime"
 	"unsafe"
 )
 
@@ -32,18 +31,12 @@ func newGeometry(cval *C.GEOSGeometry) *Geometry {
 		return nil
 	}
 
-	g := &Geometry{
+	return &Geometry{
 		cval: cval,
 	}
-
-	runtime.SetFinalizer(g, func(g *Geometry) {
-		C.GEOSGeom_destroy_r(handle, cval)
-	})
-
-	return g
 }
 
-func GeometryFromWKT(wkt string) *Geometry {
+func NewGeometryFromWKT(wkt string) *Geometry {
 	cstr := C.CString(wkt)
 	defer C.free(unsafe.Pointer(cstr))
 
@@ -72,8 +65,12 @@ func NewPolygon(shell *Geometry, holes ...*Geometry) *Geometry {
 	for _, h := range holes {
 		hs = append(hs, h.cval)
 	}
-	v := C.GEOSGeom_createPolygon_r(handle, shell.cval, &hs[0], C.uint(n))
+	if n > 0 {
+		v := C.GEOSGeom_createPolygon_r(handle, shell.cval, &hs[0], C.uint(n))
+		return newGeometry(v)
+	}
 
+	v := C.GEOSGeom_createPolygon_r(handle, shell.cval, nil, 0)
 	return newGeometry(v)
 }
 
@@ -92,6 +89,9 @@ func NewMultiPolygon(polys ...*Geometry) *Geometry {
 func NewGeometryCollection(t GeometryType, geometries ...*Geometry) *Geometry {
 	n := len(geometries)
 	gs := make([]*C.GEOSGeometry, 0, n)
+	for _, g := range geometries {
+		gs = append(gs, g.cval)
+	}
 	v := C.GEOSGeom_createCollection_r(handle, C.int(t), &gs[0], C.uint(n))
 	return newGeometry(v)
 }

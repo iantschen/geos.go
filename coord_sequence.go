@@ -4,7 +4,6 @@ package geos
 #include "geos.h"
 */
 import "C"
-import "runtime"
 
 type CoordSequence struct {
 	cval *C.GEOSCoordSequence
@@ -22,10 +21,6 @@ func NewCoordSequence(coords []Coordinate) *CoordSequence {
 		C.GEOSCoordSeq_setY_r(handle, v, C.uint(i), C.double(c[1]))
 	}
 
-	runtime.SetFinalizer(cs, func(*CoordSequence) {
-		C.GEOSCoordSeq_destroy_r(handle, v)
-	})
-
 	return cs
 }
 
@@ -35,10 +30,5 @@ func (cs *CoordSequence) Clone() *CoordSequence {
 		return nil
 	}
 
-	cs1 := &CoordSequence{cval: v}
-	runtime.SetFinalizer(cs, func(*CoordSequence) {
-		C.GEOSCoordSeq_destroy_r(handle, v)
-	})
-
-	return cs1
+	return &CoordSequence{cval: v}
 }
