@@ -4,7 +4,6 @@ package geos
 #cgo LDFLAGS: -lgeos_c
 #include "geos.h"
 */
-
 import "C"
 
 var (

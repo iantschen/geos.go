@@ -1,8 +1,8 @@
 package geos
 
 /*
-#include <geos_c.h>
 #include <stdlib.h>
+#include <geos_c.h>
 */
 import "C"
 import (
