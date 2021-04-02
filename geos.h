@@ -6,10 +6,8 @@
 
 #include <geos_c.h>
 
-void notice_handler(const char *fmt, ...);
-//void error_handler(const char *fmt, ...);
-
-const char *get_last_error(void);
+// void notice_handler(const char *fmt, ...);
+// void error_handler(const char *fmt, ...);
 
 GEOSContextHandle_t newHandle();
 GEOSWKTReader * newWKTReader(GEOSContextHandle_t h);
