@@ -44,6 +44,14 @@ func NewGeometryFromWKT(wkt string) *Geometry {
 	return newGeometry(v)
 }
 
+func NewGeometryFromWKB(wkb []byte) *Geometry {
+	cbs := C.CBytes(wkb)
+	defer C.free(cbs)
+
+	v := C.GEOSWKBReader_read_r(handle, bReader, (*C.uchar)(cbs), C.size_t(len(wkb)))
+	return newGeometry(v)
+}
+
 func NewPoint(cs *CoordSequence) *Geometry {
 	v := C.GEOSGeom_createPoint_r(handle, cs.cval)
 	return newGeometry(v)
@@ -151,6 +159,15 @@ func (g *Geometry) ToWKT() string {
 		defer C.free(unsafe.Pointer(v))
 	}
 	return C.GoString(v)
+}
+
+func (g *Geometry) ToWKB() []byte {
+	var n C.size_t
+	v := C.GEOSWKBWriter_write_r(handle, bWriter, g.cval, &n)
+	if v != nil {
+		defer C.free(unsafe.Pointer(v))
+	}
+	return C.GoBytes(unsafe.Pointer(v), C.int(n))
 }
 
 func (g *Geometry) Disjoint(other *Geometry) bool   { return Disjoint(g, other) }
