@@ -32,22 +32,3 @@ GEOSContextHandle_t newHandle()
     return h;
 }
 
-GEOSWKTReader * newWKTReader(GEOSContextHandle_t h) 
-{
-    return GEOSWKTReader_create_r(h);
-}
-
-GEOSWKTWriter * newWKTWriter(GEOSContextHandle_t h) 
-{
-    return GEOSWKTWriter_create_r(h);
-}
-
-GEOSWKBReader * newWKBReader(GEOSContextHandle_t h) 
-{
-    return GEOSWKBReader_create_r(h);
-}
-
-GEOSWKBWriter * newWKBWriter(GEOSContextHandle_t h) 
-{
-    return GEOSWKBWriter_create_r(h);
-}

@@ -40,6 +40,9 @@ func NewGeometryFromWKT(wkt string) *Geometry {
 	cstr := C.CString(wkt)
 	defer C.free(unsafe.Pointer(cstr))
 
+	reader := C.GEOSWKTReader_create_r(handle)
+	defer C.GEOSWKTReader_destroy_r(handle, reader)
+
 	v := C.GEOSWKTReader_read_r(handle, reader, cstr)
 	return newGeometry(v)
 }
@@ -48,7 +51,10 @@ func NewGeometryFromWKB(wkb []byte) *Geometry {
 	cbs := C.CBytes(wkb)
 	defer C.free(cbs)
 
-	v := C.GEOSWKBReader_read_r(handle, bReader, (*C.uchar)(cbs), C.size_t(len(wkb)))
+	reader := C.GEOSWKBReader_create_r(handle)
+	defer C.GEOSWKBReader_destroy_r(handle, reader)
+
+	v := C.GEOSWKBReader_read_r(handle, reader, (*C.uchar)(cbs), C.size_t(len(wkb)))
 	return newGeometry(v)
 }
 
@@ -154,19 +160,28 @@ func (g *Geometry) Clone() *Geometry {
 }
 
 func (g *Geometry) ToWKT() string {
+	writer := C.GEOSWKTWriter_create_r(handle)
+	defer C.GEOSWKTWriter_destroy_r(handle, writer)
+
 	v := C.GEOSWKTWriter_write_r(handle, writer, g.cval)
 	if v != nil {
 		defer C.free(unsafe.Pointer(v))
 	}
+
 	return C.GoString(v)
 }
 
 func (g *Geometry) ToWKB() []byte {
 	var n C.size_t
-	v := C.GEOSWKBWriter_write_r(handle, bWriter, g.cval, &n)
+
+	writer := C.GEOSWKBWriter_create_r(handle)
+	defer C.GEOSWKBWriter_destroy_r(handle, writer)
+
+	v := C.GEOSWKBWriter_write_r(handle, writer, g.cval, &n)
 	if v != nil {
 		defer C.free(unsafe.Pointer(v))
 	}
+
 	return C.GoBytes(unsafe.Pointer(v), C.int(n))
 }
 
