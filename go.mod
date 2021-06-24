@@ -1,3 +1,3 @@
 module github.com/thypris/geos.go
 
-go 1.14
+go 1.16

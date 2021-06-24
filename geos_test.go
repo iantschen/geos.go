@@ -9,7 +9,7 @@ func TestGeosInit(t *testing.T) {
 
 func TestGeosWKTCodec(t *testing.T) {
 	s := "POINT(123.456 31.654)"
-	g := GeometryFromWKT(s)
+	g := NewGeometryFromWKT(s)
 	tp := g.Type()
 	t.Logf("type: %d\nwkt: %s", tp, g.ToWKT())
 
