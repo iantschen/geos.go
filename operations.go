@@ -24,3 +24,8 @@ func TopologyPreserveSimplify(g *Geometry, tolerance float64) *Geometry {
 	v := C.GEOSTopologyPreserveSimplify_r(handle, g.cval, C.double(tolerance))
 	return newGeometry(v)
 }
+
+func PointOnSurface(g *Geometry) *Geometry {
+	v := C.GEOSPointOnSurface_r(handle, g.cval)
+	return newGeometry(v)
+}
