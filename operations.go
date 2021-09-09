@@ -29,3 +29,8 @@ func PointOnSurface(g *Geometry) *Geometry {
 	v := C.GEOSPointOnSurface_r(handle, g.cval)
 	return newGeometry(v)
 }
+
+func MakeValid(g *Geometry) *Geometry {
+	v := C.GEOSMakeValid_r(handle, g.cval)
+	return newGeometry(v)
+}
