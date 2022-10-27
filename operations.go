@@ -10,6 +10,16 @@ func Intersection(g1, g2 *Geometry) *Geometry {
 	return newGeometry(v)
 }
 
+func Union(g1, g2 *Geometry) *Geometry {
+	v := C.GEOSUnion_r(handle, g1.cval, g2.cval)
+	return newGeometry(v)
+}
+
+func Difference(g1, g2 *Geometry) *Geometry {
+	v := C.GEOSDifference_r(handle, g1.cval, g2.cval)
+	return newGeometry(v)
+}
+
 func Buffer(g *Geometry, width float64, quadsegs int) *Geometry {
 	v := C.GEOSBuffer_r(handle, g.cval, C.double(width), C.int(quadsegs))
 	return newGeometry(v)
